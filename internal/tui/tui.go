@@ -531,7 +531,7 @@ func (m *model) viewRunning() string {
 		case 4:
 			mark, name, det = sRed.Render("✘"), names[i], sDim.Render(s.detail)
 		}
-		b.WriteString(mark + " " + pad(name, 15) + det + "\n")
+		b.WriteString(hang(mark+" "+pad(name, 15), det, lipgloss.Width(mark)+16, m.inner()) + "\n")
 	}
 	for _, w := range m.warns {
 		b.WriteString("\n" + sAmber.Render("! "+w))

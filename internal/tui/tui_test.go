@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/termenv"
 
 	"fckdigression/internal/core"
 )
@@ -50,4 +52,35 @@ func TestScreensRender(t *testing.T) {
 	m.scr, m.resOK, m.resText = scResult, false, "This phone has 2 account(s): com.google, com.whatsapp."
 	m.resFix = "Android only grants device owner on a phone with no accounts."
 	show("result", m)
+}
+
+// TestDumpScreens writes the dashboard and a finished lock as ANSI text, for the README screenshots.
+// Run with: DUMP_SCREENS=docs/screenshots/src go test ./internal/tui -run TestDumpScreens
+func TestDumpScreens(t *testing.T) {
+	dir := os.Getenv("DUMP_SCREENS")
+	if dir == "" {
+		t.Skip("set DUMP_SCREENS to a folder")
+	}
+	lipgloss.SetColorProfile(termenv.TrueColor)
+	lipgloss.SetHasDarkBackground(true)
+	phone := &core.Phone{Serial: "8a3f21c0", Model: "Google Pixel 8", Android: "15", SDK: 35}
+	st := core.ParseStatus("app_version=2 owner=true dns_mode=hostname dns=dns.example.com lock_dns=true lock_users=true lock_reset=true lock_vpn=true lock_debug=false code_set=true code_len=30 fails=0 wait_s=0")
+	m := newModel("")
+	m.width = 76
+	m.phone, m.st, m.scr = phone, st, scDash
+	m.buildMenu()
+	write := func(name string) {
+		if err := os.WriteFile(dir+"/"+name, []byte(m.View()), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("tui-dashboard.ansi")
+
+	m.scr, m.runTitle, m.resOK, m.resText = scResult, "Lock this phone", true, "Phone locked. You can add accounts now."
+	m.steps = []stepState{
+		{2, "Google Pixel 8 · Android 15 · 8a3f21c0"}, {2, "none"}, {2, "fckdigression app v2 installed"},
+		{2, "app is device owner"}, {2, "Private DNS → dns.example.com · blocked: Private DNS, extra users, factory reset, VPN"},
+		{2, "turned off"},
+	}
+	write("tui-locked.ansi")
 }

@@ -12,6 +12,7 @@ internal/build/    builds the APK with the SDK tools, no Gradle
 internal/apk/      embeds dist/fckd.apk into the binary
 android/           the Android app (plain Java, no AndroidX)
 design/            mockups
+docs/screenshots/  README images and the script that renders them
 legacy/phonelock   the original bash tool
 ```
 
@@ -28,6 +29,15 @@ fckd build      # APK only, to android/build/fckd.apk
 The app is built with `aapt2`, `javac --release 11`, `d8`, `zipalign` and `apksigner`, using the newest `build-tools` and `platforms` found in the SDK. Min SDK 29, target 34.
 
 d8 from build-tools 34 crashes on inner and anonymous classes compiled by recent JDKs (it chokes on their `MethodParameters` attribute). The app uses lambdas instead.
+
+## Screenshots
+
+`docs/screenshots/terminal.png` shows the real TUI output. The phone screens in `phones.png` are redrawn in HTML from `MainActivity` (the app blocks screenshots), so update `render.py` when the app's screens change.
+
+```sh
+DUMP_SCREENS=docs/screenshots/src go test ./internal/tui -run TestDumpScreens
+python3 docs/screenshots/src/render.py     # needs Firefox
+```
 
 ## How the PC talks to the app
 

@@ -1,3 +1,5 @@
+<img src="docs/logo.svg" alt="" width="96" height="96">
+
 # fckdigression
 
 Locks distractions out of an Android phone. Someone else keeps the code.
@@ -5,6 +7,8 @@ Locks distractions out of an Android phone. Someone else keeps the code.
 `fckd` installs a small app on the phone over USB and makes it the device owner. The app points Private DNS at a filtering server of your choice and blocks the settings that would get around it. Only the parent code lifts the lock.
 
 DNS is the first guard. More will follow (apps, schedules).
+
+![The fckd app on the phone: entering the parent code, locked, unlocked](docs/screenshots/phones.png)
 
 ## What the DNS guard blocks
 
@@ -41,6 +45,8 @@ fckd lock --dns dns.example.com
 The person who keeps the code types it when asked (6 digits or more). `--generate-code` makes a random 30-digit code and shows it once instead. The phone only stores a salted SHA-256 of the code.
 
 Running `fckd` with no arguments opens a full-screen interface that does the same.
+
+![fckd in the terminal: the phone's status, and a finished lock](docs/screenshots/terminal.png)
 
 ## Unlock
 
@@ -83,3 +89,7 @@ For the same reason, the package id stays `fr.lucas.dnslock`.
 ## More
 
 - [docs/development.md](docs/development.md): project layout, how the PC and the app talk, build notes
+
+## License
+
+[MIT](LICENSE)
