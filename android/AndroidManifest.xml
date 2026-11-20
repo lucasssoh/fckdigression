@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The package id stays fr.lucas.dnslock: the app is device owner on phones in use,
+     and changing the id or the signing key would mean a factory reset. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="fr.lucas.dnslock"
+    android:versionCode="2"
+    android:versionName="2.0">
+
+    <application
+        android:label="fckd"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:theme="@style/App"
+        android:allowBackup="false">
+
+        <!-- Device admin / device owner status -->
+        <receiver
+            android:name=".AdminReceiver"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Commands from the computer tool over adb.
+             Protected by DUMP: only the adb shell / the system can call it, no other app. -->
+        <receiver
+            android:name=".CommandReceiver"
+            android:exported="true"
+            android:permission="android.permission.DUMP">
+            <intent-filter>
+                <action android:name="fr.lucas.dnslock.LOCK" />
+                <action android:name="fr.lucas.dnslock.FINALIZE" />
+                <action android:name="fr.lucas.dnslock.STATUS" />
+                <action android:name="fr.lucas.dnslock.UNLOCK" />
+            </intent-filter>
+        </receiver>
+
+        <!-- On-phone screen: status, parent code, lock again, remove -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

@@ -1,0 +1,611 @@
+<title>fckdigression Mockups</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a long review sheet. Each section = one deliverable (icon, app, CLI, TUI), mockups laid out on a wrapping grid, decisions at the end. */
+:root {
+  --bg: #F2F4F3;
+  --surface: #FFFFFF;
+  --fg: #16201F;
+  --muted: #5B6967;
+  --line: #D6DDDB;
+  --pine: #0F5C5A;          /* brand: fckdigression */
+  --pine-soft: #DCEBE9;
+  --amber: #E3A93B;         /* the key */
+  --danger: #B3402E;
+  --ok: #2E7D4F;
+  --term-bg: #101615;
+  --term-fg: #D5DEDC;
+  --term-dim: #6E7C7A;
+  --term-pine: #5FC2B8;
+  --term-amber: #F0BE5A;
+  --term-red: #F07A65;
+  --term-green: #7DD69A;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1414; --surface: #172020; --fg: #E4ECEA; --muted: #93A3A0; --line: #2A3735;
+    --pine: #4DB3A8; --pine-soft: #1D3432; --amber: #EDB958; --danger: #E77C68; --ok: #6FCB91;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1414; --surface: #172020; --fg: #E4ECEA; --muted: #93A3A0; --line: #2A3735;
+  --pine: #4DB3A8; --pine-soft: #1D3432; --amber: #EDB958; --danger: #E77C68; --ok: #6FCB91;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 80px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 64px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.05rem; font-weight: 600; }
+p { margin: 0; max-width: 65ch; }
+code { font-family: var(--mono); font-size: 0.88em; background: var(--pine-soft); padding: 1px 5px; border-radius: 4px; }
+.eyebrow { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--pine); font-weight: 600; }
+header.top { display: flex; flex-direction: column; gap: 14px; }
+header.top p { color: var(--muted); font-size: 1.05rem; }
+section { display: flex; flex-direction: column; gap: 24px; }
+.sec-head { display: flex; flex-direction: column; gap: 8px; border-top: 2px solid var(--fg); padding-top: 16px; }
+.sec-head p { color: var(--muted); }
+.note { font-size: 0.85rem; color: var(--muted); }
+
+/* ---------- Icons ---------- */
+.icons { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+.icon-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.icon-card.pick { border-color: var(--pine); box-shadow: 0 0 0 1px var(--pine); }
+.icon-row { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
+.icon-row svg { display: block; }
+.m-circle { border-radius: 50%; overflow: hidden; }
+.m-squircle { border-radius: 30%; overflow: hidden; }
+.m-small { border-radius: 50%; overflow: hidden; }
+.mono-ico { border-radius: 50%; overflow: hidden; }
+.badge { align-self: flex-start; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pine); background: var(--pine-soft); padding: 3px 8px; border-radius: 999px; }
+.icon-card p { font-size: 0.9rem; color: var(--muted); }
+
+/* ---------- Phones ---------- */
+.phones { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; justify-items: center; }
+.phone-col { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 270px; }
+.phone-col .cap { font-size: 0.85rem; color: var(--muted); }
+.phone-col .cap b { color: var(--fg); font-weight: 600; }
+.phone {
+  --p-bg: #F6F8F7; --p-fg: #142120; --p-muted: #5D6B69; --p-card: #FFFFFF; --p-line: #DEE5E3;
+  width: 100%; aspect-ratio: 9 / 19.5; max-width: 100%;
+  border-radius: 34px; border: 8px solid #1B2322; background: var(--p-bg); color: var(--p-fg);
+  overflow: hidden; display: flex; flex-direction: column; font-size: 12.5px; position: relative;
+}
+.phone.dark { --p-bg: #0F1515; --p-fg: #E2EAE8; --p-muted: #8FA09D; --p-card: #182221; --p-line: #26332F; }
+.sbar { display: flex; justify-content: space-between; padding: 8px 18px 4px; font-size: 10.5px; font-weight: 600; color: var(--p-muted); font-variant-numeric: tabular-nums; }
+.screen { flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 10px 16px 16px; min-height: 0; }
+.app-title { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 700; font-size: 15px; }
+.app-title svg { border-radius: 30%; }
+.hero-state { border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+.hero-state.locked { background: #0F5C5A; color: #F2FBFA; }
+.hero-state.unlocked { background: #F3E3BF; color: #3D2B05; }
+.phone.dark .hero-state.unlocked { background: #3A2E14; color: #F6E2B4; }
+.hero-state.idle { background: var(--p-card); border: 1px dashed var(--p-line); }
+.hero-state .big { font-family: var(--display); font-size: 21px; font-weight: 700; line-height: 1.1; display: flex; align-items: center; gap: 8px; }
+.hero-state .sub { font-size: 11.5px; opacity: 0.85; }
+.hero-state .host { font-family: var(--mono); font-size: 11px; background: rgba(255,255,255,0.14); border-radius: 6px; padding: 3px 7px; align-self: flex-start; margin-top: 4px; }
+.hero-state.unlocked .host { background: rgba(0,0,0,0.08); }
+.list { background: var(--p-card); border-radius: 14px; border: 1px solid var(--p-line); display: flex; flex-direction: column; }
+.list .row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; gap: 8px; }
+.list .row + .row { border-top: 1px solid var(--p-line); }
+.list .k { color: var(--p-muted); }
+.pill { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+.pill.on { background: #DCEBE9; color: #0F5C5A; }
+.pill.off { background: #F3E3BF; color: #6B4A08; }
+.phone.dark .pill.on { background: #1D3432; color: #7FD0C6; }
+.phone.dark .pill.off { background: #3A2E14; color: #EDC473; }
+.spacer { flex: 1; }
+.groups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.groups .g { font-family: var(--mono); font-size: 15px; letter-spacing: 1px; text-align: center; padding: 6px 0; border-radius: 8px; border: 1px solid var(--p-line); background: var(--p-card); min-height: 33px; }
+.groups .g.done { color: var(--p-fg); }
+.groups .g.cur { border-color: #0F5C5A; box-shadow: 0 0 0 1px #0F5C5A; }
+.phone.dark .groups .g.cur { border-color: #4DB3A8; box-shadow: 0 0 0 1px #4DB3A8; }
+.groups .g i { font-style: normal; color: var(--p-muted); }
+.gmeta { display: flex; justify-content: space-between; font-size: 11px; color: var(--p-muted); font-variant-numeric: tabular-nums; }
+.gmeta .eye { color: #0F5C5A; font-weight: 600; }
+.phone.dark .gmeta .eye { color: #4DB3A8; }
+.glabel { display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--p-muted); margin-bottom: -6px; }
+.glabel span + span { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.btn { border-radius: 999px; text-align: center; padding: 10px; font-weight: 600; font-size: 12.5px; }
+.btn.primary { background: #0F5C5A; color: #fff; }
+.phone.dark .btn.primary { background: #4DB3A8; color: #08201E; }
+.btn.ghost { color: var(--p-muted); }
+.btn.danger { background: #B3402E; color: #fff; }
+.btn.disabled { background: var(--p-line); color: var(--p-muted); }
+.pin-title { text-align: center; font-weight: 600; font-size: 13px; }
+.pin-sub { text-align: center; color: var(--p-muted); font-size: 11px; margin-top: -8px; }
+.dots { display: flex; justify-content: center; gap: 10px; padding: 4px 0; }
+.dots i { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--p-muted); }
+.dots i.f { background: var(--p-fg); border-color: var(--p-fg); }
+.dots.err i { border-color: #B3402E; }
+.err-msg { text-align: center; color: #B3402E; font-size: 11px; font-weight: 600; }
+.phone.dark .err-msg { color: #E77C68; }
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.keypad span { text-align: center; padding: 9px 0; font-size: 17px; font-weight: 500; border-radius: 12px; background: var(--p-card); border: 1px solid var(--p-line); font-variant-numeric: tabular-nums; }
+.keypad span.fn { background: transparent; border-color: transparent; font-size: 12px; color: var(--p-muted); display: flex; align-items: center; justify-content: center; }
+.keypad.off span { opacity: 0.35; }
+.timer { text-align: center; font-family: var(--display); font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sheet { position: absolute; inset: auto 0 0 0; background: var(--p-card); border-radius: 20px 20px 0 0; padding: 18px 16px 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 -10px 30px rgba(0,0,0,0.18); }
+.sheet h4 { margin: 0; font-family: var(--display); font-size: 15px; }
+.sheet p { font-size: 11.5px; color: var(--p-muted); }
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,0.35); }
+.steps { font-size: 11.5px; display: flex; flex-direction: column; gap: 6px; padding-left: 0; margin: 0; list-style: none; counter-reset: s; }
+.steps li { counter-increment: s; display: flex; gap: 8px; }
+.steps li::before { content: counter(s); flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--p-line); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.cmd { font-family: var(--mono); font-size: 10.5px; background: var(--p-line); border-radius: 6px; padding: 6px 8px; overflow-wrap: anywhere; }
+
+/* ---------- Terminals ---------- */
+.terms { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr)); gap: 20px; }
+.term-wrap { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.term-wrap h3 { font-size: 0.95rem; }
+.term { background: var(--term-bg); color: var(--term-fg); border-radius: 12px; overflow-x: auto; border: 1px solid #222d2b; }
+.term .tbar { display: flex; gap: 6px; padding: 10px 12px; border-bottom: 1px solid #1f2927; }
+.term .tbar i { width: 10px; height: 10px; border-radius: 50%; background: #2c3836; }
+.term pre { margin: 0; padding: 14px 16px 16px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre; }
+.t-dim { color: var(--term-dim); }
+.t-pine { color: var(--term-pine); }
+.t-amber { color: var(--term-amber); }
+.t-red { color: var(--term-red); }
+.t-green { color: var(--term-green); }
+.t-b { font-weight: 600; color: #F2F7F6; }
+.t-inv { background: var(--term-pine); color: var(--term-bg); font-weight: 600; }
+.t-sel { background: #1E2B29; }
+
+/* ---------- Decisions ---------- */
+.decisions { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.dec { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+.dec .q { font-weight: 600; }
+.dec p { font-size: 0.9rem; color: var(--muted); }
+.dec .rec { font-size: 0.85rem; color: var(--pine); font-weight: 600; }
+.constraints { background: var(--pine-soft); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+.constraints ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.constraints li { max-width: 80ch; }
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <span class="eyebrow">fckdigression · draft 2</span>
+  <h1>fckdigression, first pass</h1>
+  <p>The project is now <b>fckdigression</b>: a tool that locks distractions out of your phone, with the parent code kept by someone else. DNS is the first <b>guard</b>, and any DNS-over-TLS server works: public, private or your own. The app, the CLI (<code>fckd</code>) and the TUI are built so more guards can be added later. Pick what you like at the bottom of the page.</p>
+</header>
+
+<!-- ======================= ICON ======================= -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">1 · Launcher icon</span>
+    <h2>Three icon directions</h2>
+    <p>Drawn on Android's 108 dp adaptive grid, with everything inside the 72 dp safe zone, so they survive circle, squircle and themed (monochrome) masks.</p>
+  </div>
+  <div class="icons">
+
+    <div class="icon-card pick">
+      <span class="badge">Recommended</span>
+      <h3>D · Straight line</h3>
+      <div class="icon-row">
+        <svg class="m-circle" width="96" height="96" viewBox="0 0 108 108"><rect width="108" height="108" fill="#0F5C5A"/><path d="M22 54c3.5-13 10-13 13 0s9.5 13 13 0" fill="none" stroke="#F2FBFA" stroke-opacity=".6" stroke-width="6.5" stroke-linecap="round"/><path d="M48 54h24" stroke="#E3A93B" stroke-width="6.5" stroke-linecap="round"/><circle cx="80" cy="54" r="7" fill="#E3A93B"/></svg>
+        <svg class="m-squircle" width="72" height="72" viewBox="0 0 108 108"><rect width="108" height="108" fill="#0F5C5A"/><path d="M22 54c3.5-13 10-13 13 0s9.5 13 13 0" fill="none" stroke="#F2FBFA" stroke-opacity=".6" stroke-width="6.5" stroke-linecap="round"/><path d="M48 54h24" stroke="#E3A93B" stroke-width="6.5" stroke-linecap="round"/><circle cx="80" cy="54" r="7" fill="#E3A93B"/></svg>
+        <svg class="m-small" width="40" height="40" viewBox="0 0 108 108"><rect width="108" height="108" fill="#0F5C5A"/><path d="M22 54c3.5-13 10-13 13 0s9.5 13 13 0" fill="none" stroke="#F2FBFA" stroke-opacity=".6" stroke-width="6.5" stroke-linecap="round"/><path d="M48 54h24" stroke="#E3A93B" stroke-width="6.5" stroke-linecap="round"/><circle cx="80" cy="54" r="7" fill="#E3A93B"/></svg>
+        <svg class="mono-ico" width="40" height="40" viewBox="0 0 108 108"><rect width="108" height="108" fill="#D9E4E2"/><path d="M22 54c3.5-13 10-13 13 0s9.5 13 13 0" fill="none" stroke="#2B3D3B" stroke-opacity=".6" stroke-width="6.5" stroke-linecap="round"/><path d="M48 54h24" stroke="#2B3D3B" stroke-width="6.5" stroke-linecap="round"/><circle cx="80" cy="54" r="7" fill="#2B3D3B"/></svg>
+      </div>
+      <p>The name drawn: a wandering line that gets cut short and goes straight to the point. Fits the brand, isn't tied to DNS, and stays clear at 40 px and as a themed icon.</p>
+    </div>
+
+    <div class="icon-card">
+      <span class="badge" style="visibility:hidden">·</span>
+      <h3>A · Keyhole padlock</h3>
+      <div class="icon-row">
+        <svg class="m-circle" width="96" height="96" viewBox="0 0 108 108"><rect width="108" height="108" fill="#0F5C5A"/><path d="M42 52V43a12 12 0 0 1 24 0v9" fill="none" stroke="#F2FBFA" stroke-width="7" stroke-linecap="round"/><rect x="33" y="50" width="42" height="32" rx="8" fill="#E3A93B"/><circle cx="54" cy="63" r="4.6" fill="#0F5C5A"/><rect x="51.8" y="64" width="4.4" height="10" rx="2.2" fill="#0F5C5A"/></svg>
+        <svg class="m-squircle" width="72" height="72" viewBox="0 0 108 108"><rect width="108" height="108" fill="#0F5C5A"/><path d="M42 52V43a12 12 0 0 1 24 0v9" fill="none" stroke="#F2FBFA" stroke-width="7" stroke-linecap="round"/><rect x="33" y="50" width="42" height="32" rx="8" fill="#E3A93B"/><circle cx="54" cy="63" r="4.6" fill="#0F5C5A"/><rect x="51.8" y="64" width="4.4" height="10" rx="2.2" fill="#0F5C5A"/></svg>
+        <svg class="m-small" width="40" height="40" viewBox="0 0 108 108"><rect width="108" height="108" fill="#0F5C5A"/><path d="M42 52V43a12 12 0 0 1 24 0v9" fill="none" stroke="#F2FBFA" stroke-width="7" stroke-linecap="round"/><rect x="33" y="50" width="42" height="32" rx="8" fill="#E3A93B"/><circle cx="54" cy="63" r="4.6" fill="#0F5C5A"/><rect x="51.8" y="64" width="4.4" height="10" rx="2.2" fill="#0F5C5A"/></svg>
+        <svg class="mono-ico" width="40" height="40" viewBox="0 0 108 108"><rect width="108" height="108" fill="#D9E4E2"/><path d="M42 52V43a12 12 0 0 1 24 0v9" fill="none" stroke="#2B3D3B" stroke-width="7" stroke-linecap="round"/><rect x="33" y="50" width="42" height="32" rx="8" fill="#2B3D3B"/><circle cx="54" cy="63" r="4.6" fill="#D9E4E2"/><rect x="51.8" y="64" width="4.4" height="10" rx="2.2" fill="#D9E4E2"/></svg>
+      </div>
+      <p>Pine background, amber body. Very legible, but it says "security app" and nothing about focus.</p>
+    </div>
+
+    <div class="icon-card">
+      <span class="badge" style="visibility:hidden">·</span>
+      <h3>B · Shield of records</h3>
+      <div class="icon-row">
+        <svg class="m-circle" width="96" height="96" viewBox="0 0 108 108"><rect width="108" height="108" fill="#E3A93B"/><path d="M54 24l24 9v19c0 16-10 27-24 33-14-6-24-17-24-33V33z" fill="#0F5C5A"/><g fill="#F2FBFA"><circle cx="43" cy="44" r="2.6"/><rect x="48" y="42" width="18" height="4" rx="2"/><circle cx="43" cy="54" r="2.6"/><rect x="48" y="52" width="18" height="4" rx="2"/><circle cx="43" cy="64" r="2.6"/><rect x="48" y="62" width="12" height="4" rx="2"/></g></svg>
+        <svg class="m-squircle" width="72" height="72" viewBox="0 0 108 108"><rect width="108" height="108" fill="#E3A93B"/><path d="M54 24l24 9v19c0 16-10 27-24 33-14-6-24-17-24-33V33z" fill="#0F5C5A"/><g fill="#F2FBFA"><circle cx="43" cy="44" r="2.6"/><rect x="48" y="42" width="18" height="4" rx="2"/><circle cx="43" cy="54" r="2.6"/><rect x="48" y="52" width="18" height="4" rx="2"/><circle cx="43" cy="64" r="2.6"/><rect x="48" y="62" width="12" height="4" rx="2"/></g></svg>
+        <svg class="m-small" width="40" height="40" viewBox="0 0 108 108"><rect width="108" height="108" fill="#E3A93B"/><path d="M54 24l24 9v19c0 16-10 27-24 33-14-6-24-17-24-33V33z" fill="#0F5C5A"/><g fill="#F2FBFA"><circle cx="43" cy="44" r="2.6"/><rect x="48" y="42" width="18" height="4" rx="2"/><circle cx="43" cy="54" r="2.6"/><rect x="48" y="52" width="18" height="4" rx="2"/><circle cx="43" cy="64" r="2.6"/><rect x="48" y="62" width="12" height="4" rx="2"/></g></svg>
+      </div>
+      <p>A shield holding DNS records. Says "protected resolver" more precisely, but the lines blur at small sizes.</p>
+    </div>
+
+    <div class="icon-card">
+      <span class="badge" style="visibility:hidden">·</span>
+      <h3>C · Pinned globe</h3>
+      <div class="icon-row">
+        <svg class="m-circle" width="96" height="96" viewBox="0 0 108 108"><rect width="108" height="108" fill="#14302E"/><g fill="none" stroke="#F2FBFA" stroke-width="4.5"><circle cx="49" cy="50" r="20"/><ellipse cx="49" cy="50" rx="8.5" ry="20"/><path d="M29 50h40"/></g><circle cx="70" cy="70" r="15" fill="#E3A93B"/><path d="M65.5 69v-3.5a4.5 4.5 0 0 1 9 0V69" fill="none" stroke="#14302E" stroke-width="3"/><rect x="62.5" y="68" width="15" height="10.5" rx="2.5" fill="#14302E"/></svg>
+        <svg class="m-squircle" width="72" height="72" viewBox="0 0 108 108"><rect width="108" height="108" fill="#14302E"/><g fill="none" stroke="#F2FBFA" stroke-width="4.5"><circle cx="49" cy="50" r="20"/><ellipse cx="49" cy="50" rx="8.5" ry="20"/><path d="M29 50h40"/></g><circle cx="70" cy="70" r="15" fill="#E3A93B"/><path d="M65.5 69v-3.5a4.5 4.5 0 0 1 9 0V69" fill="none" stroke="#14302E" stroke-width="3"/><rect x="62.5" y="68" width="15" height="10.5" rx="2.5" fill="#14302E"/></svg>
+        <svg class="m-small" width="40" height="40" viewBox="0 0 108 108"><rect width="108" height="108" fill="#14302E"/><g fill="none" stroke="#F2FBFA" stroke-width="4.5"><circle cx="49" cy="50" r="20"/><ellipse cx="49" cy="50" rx="8.5" ry="20"/><path d="M29 50h40"/></g><circle cx="70" cy="70" r="15" fill="#E3A93B"/><path d="M65.5 69v-3.5a4.5 4.5 0 0 1 9 0V69" fill="none" stroke="#14302E" stroke-width="3"/><rect x="62.5" y="68" width="15" height="10.5" rx="2.5" fill="#14302E"/></svg>
+      </div>
+      <p>"The internet, locked to one server." Friendlier, looks less like a security app, but the badge is tight near the safe-zone edge.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= APP ======================= -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">2 · Android app</span>
+    <h2>The app on the phone</h2>
+    <p>One screen that answers "is this phone protected?" at a glance, a PIN pad for the parent, and a confirmation step before the destructive action. It follows the system light/dark theme and still uses plain Android views, with no AndroidX, so the build script stays as it is.</p>
+  </div>
+  <div class="phones">
+
+    <!-- Locked -->
+    <div class="phone-col">
+      <div class="phone">
+        <div class="sbar"><span>09:41</span><span>5G ▮▮▮</span></div>
+        <div class="screen">
+          <div class="app-title"><svg width="22" height="22" viewBox="0 0 108 108"><rect width="108" height="108" fill="#0F5C5A"/><path d="M42 52V43a12 12 0 0 1 24 0v9" fill="none" stroke="#F2FBFA" stroke-width="7" stroke-linecap="round"/><rect x="33" y="50" width="42" height="32" rx="8" fill="#E3A93B"/></svg>fckdigression</div>
+          <div class="hero-state locked">
+            <div class="big">Protected</div>
+            <div class="sub">Private DNS is locked to</div>
+            <div class="host">dns.example.com</div>
+          </div>
+          <div class="glabel"><span>DNS guard</span><span>1 of 1 guards on</span></div>
+          <div class="list">
+            <div class="row"><span class="k">Private DNS changes</span><span class="pill on">Blocked</span></div>
+            <div class="row"><span class="k">VPN apps</span><span class="pill on">Blocked</span></div>
+            <div class="row"><span class="k">Factory reset</span><span class="pill on">Blocked</span></div>
+            <div class="row"><span class="k">USB debugging</span><span class="pill on">Blocked</span></div>
+          </div>
+          <div class="spacer"></div>
+          <div class="btn primary">Enter parent code</div>
+        </div>
+      </div>
+      <div class="cap"><b>Home, locked.</b> Status first, grouped by guard so new guards slot in as new blocks. The only action opens the PIN pad.</div>
+    </div>
+
+    <!-- PIN -->
+    <div class="phone-col">
+      <div class="phone">
+        <div class="sbar"><span>09:41</span><span>5G ▮▮▮</span></div>
+        <div class="screen">
+          <div class="app-title">← Parent code</div>
+          <div class="pin-title" style="margin-top:4px">Enter the parent code</div>
+          <div class="pin-sub">Have it read out to you in groups of 5</div>
+          <div class="groups">
+            <span class="g done">•••••</span><span class="g done">•••••</span><span class="g done">•••••</span>
+            <span class="g cur">•••<i>_</i></span><span class="g"></span><span class="g"></span>
+          </div>
+          <div class="gmeta"><span>18 / 30 digits</span><span class="eye">Show digits</span></div>
+          <div class="pin-sub" style="margin-top:0">5 attempts · a wrong length doesn't count</div>
+          <div class="spacer"></div>
+          <div class="keypad">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span class="fn">⌫</span><span>0</span><span class="fn" style="color:#0F5C5A;font-weight:700">OK</span>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><b>Long code entry.</b> Digits fill groups of 5 so dictation over the phone stays in sync, with a counter and a "show digits" toggle to check for typos. OK only unlocks once the length matches, so a missed digit never burns an attempt.</div>
+    </div>
+
+    <!-- Lockout -->
+    <div class="phone-col">
+      <div class="phone dark">
+        <div class="sbar"><span>09:41</span><span>5G ▮▮▮</span></div>
+        <div class="screen">
+          <div class="app-title">← Parent code</div>
+          <div class="pin-title" style="margin-top:8px">Too many wrong codes</div>
+          <div class="pin-sub">Try again in</div>
+          <div class="timer">28:14</div>
+          <div class="pin-sub" style="margin-top:0">Each new mistake doubles the wait, up to 24 h. Entries of the wrong length are never counted.</div>
+          <div class="spacer"></div>
+          <div class="keypad off">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span class="fn">⌫</span><span>0</span><span class="fn">OK</span>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><b>Wait period</b> (dark theme). Live countdown, keypad disabled.</div>
+    </div>
+
+    <!-- Unlocked -->
+    <div class="phone-col">
+      <div class="phone">
+        <div class="sbar"><span>09:43</span><span>5G ▮▮▮</span></div>
+        <div class="screen">
+          <div class="app-title"><svg width="22" height="22" viewBox="0 0 108 108"><rect width="108" height="108" fill="#0F5C5A"/><path d="M42 52V43a12 12 0 0 1 24 0v9" fill="none" stroke="#F2FBFA" stroke-width="7" stroke-linecap="round"/><rect x="33" y="50" width="42" height="32" rx="8" fill="#E3A93B"/></svg>fckdigression</div>
+          <div class="hero-state unlocked">
+            <div class="big">Unlocked</div>
+            <div class="sub">Settings can be changed. Private DNS is still set to</div>
+            <div class="host">dns.example.com</div>
+          </div>
+          <div class="list">
+            <div class="row"><span class="k">Private DNS changes</span><span class="pill off">Allowed</span></div>
+            <div class="row"><span class="k">VPN apps</span><span class="pill off">Allowed</span></div>
+            <div class="row"><span class="k">Factory reset</span><span class="pill off">Allowed</span></div>
+            <div class="row"><span class="k">USB debugging</span><span class="pill off">Allowed</span></div>
+          </div>
+          <div class="note" style="font-size:11px;color:var(--p-muted)">To lock again, connect to a computer and run <span class="cmd" style="padding:1px 4px">fckd lock</span>.</div>
+          <div class="spacer"></div>
+          <div class="btn ghost" style="color:#B3402E">Remove fckdigression from this phone…</div>
+        </div>
+      </div>
+      <div class="cap"><b>Unlocked.</b> Amber instead of pine. "Remove" is only offered here, after the code was accepted.</div>
+    </div>
+
+    <!-- Remove confirm -->
+    <div class="phone-col">
+      <div class="phone">
+        <div class="sbar"><span>09:43</span><span>5G ▮▮▮</span></div>
+        <div class="screen">
+          <div class="app-title">fckdigression</div>
+          <div class="hero-state unlocked"><div class="big">Unlocked</div></div>
+        </div>
+        <div class="scrim"></div>
+        <div class="sheet">
+          <h4>Remove fckdigression?</h4>
+          <p>The app gives up device-owner rights and can then be uninstalled. Locking again will need a phone with <b>no accounts</b>, so in practice a factory reset.</p>
+          <div class="btn danger">Remove</div>
+          <div class="btn ghost">Cancel</div>
+        </div>
+      </div>
+      <div class="cap"><b>Confirmation.</b> Spells out the cost: locking again means removing every account.</div>
+    </div>
+
+    <!-- Not set up -->
+    <div class="phone-col">
+      <div class="phone dark">
+        <div class="sbar"><span>09:41</span><span>5G ▮▮▮</span></div>
+        <div class="screen">
+          <div class="app-title">fckdigression</div>
+          <div class="hero-state idle">
+            <div class="big">Not set up</div>
+            <div class="sub">This app needs device-owner rights, which it can only get from a computer.</div>
+          </div>
+          <ol class="steps">
+            <li>Remove every account from the phone.</li>
+            <li>Turn on USB debugging and connect the phone.</li>
+            <li>On the computer, run:</li>
+          </ol>
+          <div class="cmd">fckd lock --dns dns.example.com</div>
+        </div>
+      </div>
+      <div class="cap"><b>Not set up.</b> If the app is installed but isn't device owner, it explains how to fix that.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= CLI ======================= -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">3 · CLI</span>
+    <h2>fckd output in English</h2>
+    <p>Numbered steps, because <code>lock</code> really is a sequence. Every error says what went wrong and what to do next. Colors switch off automatically when the output isn't a terminal.</p>
+  </div>
+  <div class="terms">
+
+    <div class="term-wrap">
+      <h3>fckd lock</h3>
+      <div class="term"><div class="tbar"><i></i><i></i><i></i></div><pre><span class="t-dim">$</span> fckd lock --dns dns.example.com
+
+<span class="t-b">fckdigression 2.0</span> <span class="t-dim">· dns guard</span>
+
+<span class="t-pine">[1/6]</span> Phone      Google Pixel 8 <span class="t-dim">· Android 15 · 8a3f21c0</span>
+<span class="t-pine">[2/6]</span> Accounts   none <span class="t-green">✔</span>
+<span class="t-pine">[3/6]</span> App        fckdigression 2.0 installed <span class="t-green">✔</span>
+<span class="t-pine">[4/6]</span> Owner      app is device owner <span class="t-green">✔</span>
+
+      <span class="t-amber">Parent code</span> <span class="t-dim">(digits only, 6 or more)</span>
+      Code:    <span class="t-dim">••••• ••••• ••••• ••••• ••••• •••••</span>  30 digits
+      Confirm: <span class="t-dim">••••• ••••• ••••• ••••• ••••• •••••</span>  <span class="t-green">match ✔</span>
+      <span class="t-dim">Make sure the keeper has saved it. If it's lost, only a full wipe removes the lock.</span>
+
+<span class="t-pine">[5/6]</span> Lock       Private DNS → dns.example.com <span class="t-green">✔</span>
+             blocked: Private DNS, VPN, factory reset, extra users
+<span class="t-pine">[6/6]</span> USB        turning off USB debugging<span class="t-dim">… the connection drops now</span>
+
+<span class="t-green">✔</span> <span class="t-b">Phone locked.</span> You can add accounts now.
+  To unlock, open <span class="t-b">fckdigression</span> on the phone and enter the parent code.</pre></div>
+    </div>
+
+    <div class="term-wrap">
+      <h3>Errors you'll actually meet</h3>
+      <div class="term"><div class="tbar"><i></i><i></i><i></i></div><pre><span class="t-red">✘ This phone has 2 accounts:</span> com.google, com.whatsapp
+  Android only grants device owner on a phone with no accounts.
+  <span class="t-dim">Fix:</span> remove them in Settings → Accounts, or factory-reset
+       and skip sign-in, then run this again.
+
+<span class="t-red">✘ The phone refused the install.</span>
+  <span class="t-dim">Fix:</span> in Developer options, allow installs over USB.
+       Some phones also have "Install via USB" to turn on.
+
+<span class="t-red">✘ This computer isn't authorized yet.</span>
+  <span class="t-dim">Fix:</span> unlock the phone and tap Allow on the
+       "Allow USB debugging?" prompt.
+
+<span class="t-red">✘ dns.example.com doesn't answer DNS-over-TLS.</span>
+  Check the hostname and that the phone is online.
+
+<span class="t-red">✘ The parent code is 8 digits long.</span> Use at least 12.
+  <span class="t-dim">Tip:</span> fckd lock --generate-code prints a random 30-digit code.
+
+<span class="t-amber">! USB debugging left on (--allow-debug).</span>
+  Anyone with a cable and adb can undo the lock.</pre></div>
+    </div>
+
+    <div class="term-wrap">
+      <h3>fckd status</h3>
+      <div class="term"><div class="tbar"><i></i><i></i><i></i></div><pre><span class="t-dim">$</span> fckd status
+
+<span class="t-b">Google Pixel 8</span>  <span class="t-inv"> LOCKED </span>
+
+  Private DNS     dns.example.com <span class="t-dim">(hostname)</span>
+  DNS changes     <span class="t-green">blocked</span>
+  VPN             <span class="t-green">blocked</span>
+  Factory reset   <span class="t-green">blocked</span>
+  USB debugging   <span class="t-amber">allowed</span>  <span class="t-dim">(you're connected, so yes)</span>
+  Extra users     <span class="t-green">blocked</span>
+  Parent code     set <span class="t-dim">· 0 failed attempts</span>
+
+<span class="t-dim">$</span> fckd status --json
+{"owner":true,"locked":true,"dns":"dns.example.com",...}</pre></div>
+    </div>
+
+    <div class="term-wrap">
+      <h3>fckd --help</h3>
+      <div class="term"><div class="tbar"><i></i><i></i><i></i></div><pre><span class="t-b">fckdigression 2.0</span> — lock distractions out of an Android phone
+
+<span class="t-b">Usage</span>
+  fckd                         open the interactive TUI
+  fckd &lt;command&gt; [options]
+
+<span class="t-b">Commands</span>
+  <span class="t-pine">lock</span> [guards]     install the app and turn on the guards you pick
+  <span class="t-pine">status</span>            show the lock state of the connected phone
+  <span class="t-pine">unlock</span>            lift the lock (needs the parent code)
+  <span class="t-pine">release</span>           lift the lock and let the app be uninstalled
+  <span class="t-pine">build</span>             compile the Android app
+
+<span class="t-b">Guards</span>
+  --dns HOST         lock Private DNS to a DNS-over-TLS server
+  <span class="t-dim">(more guards later: apps, schedule…)</span>
+
+<span class="t-b">Lock options</span>
+  --allow-reset      keep factory reset available in Settings
+  --allow-vpn        allow VPN apps <span class="t-amber">(a VPN bypasses Private DNS)</span>
+  --allow-debug      leave USB debugging on <span class="t-amber">(adb can undo the lock)</span>
+  --generate-code    make a random 30-digit parent code and show it once
+
+<span class="t-b">Global</span>
+  -s, --serial ID    pick a phone when several are connected
+      --no-color     plain output
+  -h, --help         show this help
+
+<span class="t-b">Examples</span>
+  fckd lock --dns dns.example.com    <span class="t-dim"># any DNS-over-TLS server</span></pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= TUI ======================= -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">4 · TUI</span>
+    <h2>fckd with no arguments</h2>
+    <p>A full-screen view that watches for a phone over USB, shows its state live, and runs the same actions as the CLI. The lock flow becomes a guided checklist where each step checks a prerequisite before moving on.</p>
+  </div>
+  <div class="terms">
+    <div class="term-wrap">
+      <h3>Dashboard, phone connected</h3>
+      <div class="term"><div class="tbar"><i></i><i></i><i></i></div><pre><span class="t-dim">╭─</span> <span class="t-b">fckdigression</span> <span class="t-dim">────────────────────────────────────────── v2.0 ─╮</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-b">Google Pixel 8</span>               <span class="t-inv"> LOCKED </span>                     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">Android 15 · SDK 34 · 8a3f21c0</span>                            <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">Guards</span>         <span class="t-green">● dns</span>    <span class="t-dim">○ apps</span>    <span class="t-dim">○ schedule</span><span class="t-dim">  later</span>       <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">DNS server</span>     dns.example.com                            <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-green">●</span> DNS changes    blocked     <span class="t-green">●</span> Factory reset  blocked     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-green">●</span> VPN            blocked     <span class="t-amber">●</span> USB debugging  allowed     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-green">●</span> Extra users    blocked     <span class="t-green">●</span> Parent code    set         <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">├────────────────────────────────────────────────────────────┤</span>
+<span class="t-dim">│</span>  <span class="t-sel"><span class="t-pine">›</span> Update lock      <span class="t-dim">change server or options, keep owner</span>   </span><span class="t-dim">│</span>
+<span class="t-dim">│</span>    Unlock           <span class="t-dim">lift restrictions with the parent code </span><span class="t-dim">│</span>
+<span class="t-dim">│</span>    Release          <span class="t-dim">remove the app entirely</span>                <span class="t-dim">│</span>
+<span class="t-dim">│</span>    Rebuild app      <span class="t-dim">compile build/dnslock.apk</span>              <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">╰─</span> <span class="t-pine">↑↓</span> <span class="t-dim">move ·</span> <span class="t-pine">enter</span> <span class="t-dim">select ·</span> <span class="t-pine">r</span> <span class="t-dim">refresh ·</span> <span class="t-pine">q</span> <span class="t-dim">quit ─────────────╯</span></pre></div>
+    </div>
+
+    <div class="term-wrap">
+      <h3>Lock wizard, step 4 of 6</h3>
+      <div class="term"><div class="tbar"><i></i><i></i><i></i></div><pre><span class="t-dim">╭─</span> <span class="t-b">Lock this phone</span> <span class="t-dim">─────────────────────────────────── 4/6 ─╮</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-green">✔</span> Phone connected      <span class="t-dim">Google Pixel 8</span>                     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-green">✔</span> No accounts          <span class="t-dim">ready for device owner</span>             <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-green">✔</span> App installed        <span class="t-dim">fckdigression 2.0</span>                  <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-amber">◐</span> <span class="t-b">Parent code</span>                                             <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">○ Apply lock</span>                                              <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">○ Turn off USB debugging</span>                                  <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">Type the code you'll give the keeper. 6+ digits.</span>          <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">│</span>    Code      <span class="t-pine">••••• ••••• ••••• ••••• •••</span><span class="t-dim">_</span><span class="t-dim">   23/30</span>          <span class="t-dim">│</span>
+<span class="t-dim">│</span>    Confirm   <span class="t-dim">·</span>                                             <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">Server</span>   dns.example.com                                  <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">Block</span>    <span class="t-green">[x]</span> VPN   <span class="t-green">[x]</span> factory reset   <span class="t-green">[x]</span> USB debugging  <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">╰─</span> <span class="t-pine">enter</span> <span class="t-dim">next ·</span> <span class="t-pine">tab</span> <span class="t-dim">field ·</span> <span class="t-pine">esc</span> <span class="t-dim">cancel ───────────────────────────╯</span></pre></div>
+    </div>
+
+    <div class="term-wrap">
+      <h3>Waiting for a phone</h3>
+      <div class="term"><div class="tbar"><i></i><i></i><i></i></div><pre><span class="t-dim">╭─</span> <span class="t-b">fckdigression</span> <span class="t-dim">────────────────────────────────────────── v2.0 ─╮</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">│</span>               <span class="t-pine">⠋</span>  Waiting for a phone over USB…             <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">│</span>    <span class="t-dim">1.</span> Settings → About → tap the build number 7 times      <span class="t-dim">│</span>
+<span class="t-dim">│</span>    <span class="t-dim">2.</span> Developer options → turn on USB debugging            <span class="t-dim">│</span>
+<span class="t-dim">│</span>       <span class="t-dim">Some phones: also "Install via USB" and</span>              <span class="t-dim">│</span>
+<span class="t-dim">│</span>       <span class="t-dim">"USB debugging (Security settings)"</span>                  <span class="t-dim">│</span>
+<span class="t-dim">│</span>    <span class="t-dim">3.</span> Plug in the cable and tap Allow on the phone         <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                            <span class="t-dim">│</span>
+<span class="t-dim">╰─</span> <span class="t-pine">b</span> <span class="t-dim">build app ·</span> <span class="t-pine">q</span> <span class="t-dim">quit ──────────────────────────────────────╯</span></pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= DECISIONS ======================= -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">5 · To decide</span>
+    <h2>Choices before we build</h2>
+  </div>
+  <div class="decisions">
+    <div class="dec">
+      <div class="q">Icon</div>
+      <p>D, A, B or C, or a mix.</p>
+      <div class="rec">Suggested: D, the only one that says "focus" and not just "lock"</div>
+    </div>
+    <div class="dec">
+      <div class="q">Names</div>
+      <p>Project and app: <b>fckdigression</b>. Command: <code>fckd</code>, short to type. On the home screen, Android cuts labels after about 12 characters, so the icon label would read <b>fckd</b> or <b>FckDigress…</b>.</p>
+      <div class="rec">Suggested: command fckd, launcher label "fckd"</div>
+    </div>
+    <div class="dec">
+      <div class="q">TUI stack</div>
+      <p><b>Go + Bubble Tea:</b> rewrite the bash script as one static binary with CLI, TUI and a guard interface that new features plug into. <b>Bash + gum:</b> keep the script and add menus, faster but harder to grow.</p>
+      <div class="rec">Suggested: Go + Bubble Tea, since more guards are coming</div>
+    </div>
+    <div class="dec">
+      <div class="q">PIN entry on the phone</div>
+      <p>Your code is 30 digits, dictated from abroad. Proposed: a custom keypad with groups of 5, a counter, a "show digits" toggle, and the code length saved at lock time so a wrong-length entry doesn't count as an attempt. Minimum stays 6 digits.</p>
+      <div class="rec">Suggested: as mocked up</div>
+    </div>
+    <div class="dec">
+      <div class="q">Next guards (later, not in this pass)</div>
+      <p>Ideas that fit the device-owner model: hide or suspend chosen apps, block installs from the Play Store, time windows, a "keep Chrome on SafeSearch" policy. Tell me which ones matter, so the structure is ready for them.</p>
+    </div>
+  </div>
+  <div class="constraints">
+    <h3>Fixed constraints (the lock is already on your phone)</h3>
+    <ul>
+      <li>The package id <code>fr.lucas.dnslock</code> and <code>dnslock.keystore</code> stay as they are, even with the new name. Nobody sees them, and changing either means release, then reinstall on a phone with no accounts. Only the label and icon change.</li>
+      <li>To push the new app: unlock in the app (this turns USB debugging back on), connect the phone, run <code>fckd lock --keep-code</code>. It updates in place, keeps the owner rights and keeps the existing parent code, so your parents don't need to send a new one.</li>
+      <li>The app already installed doesn't store the code length. The new version learns it the first time the code is accepted.</li>
+      <li>The status keys sent by the app switch to English (<code>locked_dns</code>…). The new CLI will still read the old French keys so it works with the app already installed.</li>
+    </ul>
+  </div>
+</section>
+
+</div>

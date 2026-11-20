@@ -1,0 +1,11 @@
+# build output
+/bin/
+/android/build/
+/internal/apk/dist/*.apk
+
+# signing key: keep it, back it up, never publish it
+*.keystore
+*.keystore.bak
+
+# personal notes, scripts and data
+/local/

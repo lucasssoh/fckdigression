@@ -1,0 +1,268 @@
+#!/usr/bin/env bash
+# phonelock — verrouille le DNS privé d'un téléphone Android (10+) via adb.
+#
+# Installe l'app "DNS Lock", la rend propriétaire de l'appareil, règle le DNS privé
+# sur le serveur donné, puis interdit de le modifier (et, par défaut, la
+# réinitialisation d'usine, les VPN et le débogage USB). Le verrou ne se lève
+# qu'avec le code parent, saisi dans l'app sur le téléphone.
+#
+# Usage : phonelock <commande> [options]   (phonelock --help pour le détail)
+
+set -euo pipefail
+
+VERSION=1.0
+DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+PKG=fr.lucas.dnslock
+ADMIN="$PKG/.AdminReceiver"
+RECV="$PKG/.CommandReceiver"
+APK="$DIR/build/dnslock.apk"
+ANDROID_HOME="${ANDROID_HOME:-$HOME/Android/Sdk}"
+ADB="${ADB:-$(command -v adb 2>/dev/null || echo "$ANDROID_HOME/platform-tools/adb")}"
+MIN_PIN=6
+
+# --- affichage ---------------------------------------------------------------
+if [ -t 1 ]; then B=$'\e[1m'; R=$'\e[31m'; G=$'\e[32m'; Y=$'\e[33m'; N=$'\e[0m'; else B= R= G= Y= N=; fi
+info() { echo "${B}==>${N} $*"; }
+ok()   { echo "${G}✔${N} $*"; }
+warn() { echo "${Y}!${N} $*" >&2; }
+die()  { echo "${R}✘ $*${N}" >&2; exit 1; }
+
+usage() {
+cat <<EOF
+phonelock $VERSION — verrouille le DNS privé d'un téléphone Android via adb
+
+${B}Commandes${N}
+  lock --dns HÔTE     Installe l'app, règle le DNS privé sur HÔTE et le verrouille
+  status              Affiche l'état du verrou sur le téléphone branché
+  unlock              Lève le verrou (code parent ; seulement si le débogage USB est encore permis)
+  release             Lève le verrou ET libère l'app (désinstallable)
+  build               Compile l'app Android (fait automatiquement par lock si besoin)
+
+${B}Options de lock${N}
+  --dns HÔTE          Serveur DNS-over-TLS, ex. dns.example.com   (obligatoire)
+  --allow-reset       Ne pas bloquer la réinitialisation d'usine depuis les Paramètres
+  --allow-vpn         Ne pas bloquer les VPN (un VPN contourne le DNS privé !)
+  --allow-debug       Ne pas couper le débogage USB à la fin (permet 'unlock' par adb,
+                      mais permet aussi de contourner le verrou par adb)
+
+${B}Options générales${N}
+  -s, --serial ID     Choisir le téléphone si plusieurs sont branchés
+  -h, --help          Cette aide
+
+${B}Code parent${N}
+  Demandé au clavier (masqué, ${MIN_PIN} chiffres minimum), ou lu dans la variable
+  PHONELOCK_PIN pour un usage automatisé. Seule une empreinte salée est envoyée au téléphone.
+
+${B}Exemple${N}
+  phonelock lock --dns dns.example.com
+EOF
+}
+
+# --- adb ----------------------------------------------------------------------
+SERIAL=""
+adb_() { if [ -n "$SERIAL" ]; then "$ADB" -s "$SERIAL" "$@"; else "$ADB" "$@"; fi; }
+sh_()  { adb_ shell "$@" | tr -d '\r'; }
+
+need_device() {
+  [ -x "$ADB" ] || die "adb introuvable. Installe-le (sudo dnf install android-tools) ou définis ANDROID_HOME."
+  local devs; devs=$("$ADB" devices | tail -n +2 | grep -v '^$' || true)
+  if [ -n "$SERIAL" ]; then devs=$(echo "$devs" | grep "^$SERIAL" || true); fi
+  [ -n "$devs" ] || die "Aucun téléphone détecté. Branche-le en USB et active le débogage USB."
+  [ "$(echo "$devs" | wc -l)" -eq 1 ] || die "Plusieurs appareils branchés, précise --serial :
+$devs"
+  local state; state=$(echo "$devs" | awk '{print $2}')
+  case "$state" in
+    device) ;;
+    unauthorized) die "Le téléphone n'a pas autorisé ce PC : accepte la fenêtre « Autoriser le débogage USB » sur l'écran." ;;
+    *) die "État du téléphone : $state" ;;
+  esac
+  SERIAL=$(echo "$devs" | awk '{print $1}')
+}
+
+# Envoie une commande à l'app et affiche la réponse ("data=...").
+send() {
+  local action=$1; shift
+  local out; out=$(sh_ am broadcast -n "$RECV" -a "$PKG.$action" "$@" 2>&1 || true)
+  local data; data=$(echo "$out" | sed -n 's/.*data="\(.*\)".*/\1/p' | tail -1)
+  [ -n "$data" ] || data="ERREUR: pas de réponse de l'app ($out)"
+  echo "$data"
+}
+
+app_installed() { sh_ pm list packages "$PKG" | grep -qx "package:$PKG"; }
+current_owner() { sh_ dumpsys device_policy 2>/dev/null | sed -n '/Device Owner/,/^$/p' | grep -o 'package=[^ ]*' | head -1 | cut -d= -f2 || true; }
+
+read_pin() {
+  local p1 p2
+  if [ -n "${PHONELOCK_PIN:-}" ]; then PIN=$PHONELOCK_PIN; else
+    read -rsp "Code parent (${MIN_PIN}+ chiffres, à saisir par la personne qui le garde) : " p1; echo
+    if [ "${1:-}" = confirm ]; then
+      read -rsp "Confirme le code : " p2; echo
+      [ "$p1" = "$p2" ] || die "Les deux codes ne correspondent pas."
+    fi
+    PIN=$p1
+  fi
+  [[ "$PIN" =~ ^[0-9]+$ ]] || die "Le code doit contenir uniquement des chiffres."
+  [ ${#PIN} -ge $MIN_PIN ] || die "Le code doit faire au moins $MIN_PIN chiffres."
+}
+
+# --- build --------------------------------------------------------------------
+cmd_build() {
+  local bt; bt=$(ls -d "$ANDROID_HOME"/build-tools/* 2>/dev/null | sort -V | tail -1)
+  local plat; plat=$(ls -d "$ANDROID_HOME"/platforms/android-* 2>/dev/null | sort -V | tail -1)
+  [ -n "$bt" ] && [ -n "$plat" ] || die "SDK Android incomplet dans $ANDROID_HOME (build-tools et platforms requis)."
+  command -v javac >/dev/null || die "javac introuvable (installe un JDK)."
+  local jar="$plat/android.jar" src="$DIR/app" out="$DIR/build"
+  info "Compilation de l'app (build-tools $(basename "$bt"), $(basename "$plat"))"
+  rm -rf "$out"; mkdir -p "$out/classes" "$out/dex"
+  "$bt/aapt2" compile --dir "$src/res" -o "$out/res.zip"
+  "$bt/aapt2" link -I "$jar" --manifest "$src/AndroidManifest.xml" \
+      --min-sdk-version 29 --target-sdk-version 34 -o "$out/unsigned.apk" "$out/res.zip"
+  javac -nowarn --release 11 -classpath "$jar" -d "$out/classes" $(find "$src/src" -name '*.java') 2>&1 \
+      | grep -v '^warning\|^Note\|^1 warning' || true
+  "$bt/d8" --release --min-api 29 --lib "$jar" --output "$out/dex" $(find "$out/classes" -name '*.class')
+  (cd "$out/dex" && zip -q "$out/unsigned.apk" classes.dex)
+  "$bt/zipalign" -f 4 "$out/unsigned.apk" "$out/aligned.apk"
+  local ks="$DIR/dnslock.keystore"
+  if [ ! -f "$ks" ]; then
+    keytool -genkeypair -keystore "$ks" -storepass dnslock -keypass dnslock -alias dnslock \
+        -keyalg RSA -keysize 2048 -validity 36500 -dname "CN=DNS Lock" >/dev/null 2>&1
+  fi
+  "$bt/apksigner" sign --ks "$ks" --ks-pass pass:dnslock --out "$APK" "$out/aligned.apk"
+  rm -f "$out"/unsigned.apk "$out"/aligned.apk "$out"/res.zip "$APK.idsig"
+  ok "App compilée : $APK"
+}
+
+# --- lock ---------------------------------------------------------------------
+cmd_lock() {
+  local dns="" reset=true vpn=true debug=true
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --dns) dns=${2:-}; shift 2 ;;
+      --dns=*) dns=${1#*=}; shift ;;
+      --allow-reset) reset=false; shift ;;
+      --allow-vpn) vpn=false; shift ;;
+      --allow-debug) debug=false; shift ;;
+      *) die "Option inconnue : $1 (voir --help)" ;;
+    esac
+  done
+  [ -n "$dns" ] || die "--dns est obligatoire, ex. --dns dns.example.com"
+  [[ "$dns" =~ ^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?\.[A-Za-z]{2,}$ ]] || die "Nom de serveur DNS invalide : $dns"
+
+  need_device
+  local sdk model; sdk=$(sh_ getprop ro.build.version.sdk); model="$(sh_ getprop ro.product.manufacturer) $(sh_ getprop ro.product.model)"
+  info "Téléphone : $model (Android SDK $sdk, $SERIAL)"
+  [ "$sdk" -ge 29 ] || die "Android 10 minimum requis (SDK 29), ce téléphone est en SDK $sdk."
+
+  local owner; owner=$(current_owner)
+  if [ "$owner" = "$PKG" ]; then
+    ok "DNS Lock est déjà propriétaire de l'appareil : mise à jour du verrou."
+  else
+    [ -z "$owner" ] || die "Un autre propriétaire d'appareil est déjà défini ($owner). Impossible de continuer."
+    local n; n=$(sh_ dumpsys account | sed -n 's/^Accounts: \([0-9]*\).*/\1/p' | head -1)
+    if [ "${n:-0}" -gt 0 ]; then
+      warn "Il y a $n compte(s) sur le téléphone :"
+      sh_ dumpsys account | sed -n 's/^ *Account {name=[^,]*, type=\(.*\)}/  - \1/p' | sort | uniq -c >&2
+      die "Android exige un téléphone SANS aucun compte pour cette opération.
+   Sur un téléphone neuf : passe la connexion Google/Xiaomi au démarrage, lance phonelock,
+   puis ajoute tes comptes ensuite."
+    fi
+  fi
+
+  [ -f "$APK" ] || cmd_build
+  info "Installation de l'app DNS Lock"
+  local inst; inst=$(adb_ install -r "$APK" 2>&1 || true)
+  if ! echo "$inst" | grep -q Success; then
+    if echo "$inst" | grep -q INSTALL_FAILED_USER_RESTRICTED; then
+      die "Installation refusée par le téléphone. Sur Xiaomi : Options pour les développeurs →
+   active « Installer via USB » (et « Débogage USB (paramètres de sécurité) »), puis relance."
+    fi
+    die "Échec de l'installation : $inst"
+  fi
+  ok "App installée"
+
+  if [ "$owner" != "$PKG" ]; then
+    info "Attribution du statut de propriétaire de l'appareil"
+    local res; res=$(sh_ dpm set-device-owner "$ADMIN" 2>&1 || true)
+    echo "$res" | grep -qi "success" || die "Échec de « dpm set-device-owner » :
+$res
+   (Sur Xiaomi, il faut souvent « Débogage USB (paramètres de sécurité) » activé.)"
+    ok "DNS Lock est propriétaire de l'appareil"
+  fi
+
+  read_pin confirm
+  local salt hash
+  salt=$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')
+  hash=$(printf '%s:%s' "$salt" "$PIN" | sha256sum | cut -d' ' -f1)
+  unset PIN
+
+  info "Réglage du DNS privé sur $dns et application du verrou"
+  local r; r=$(send LOCK --es dns "$dns" --es salt "$salt" --es hash "$hash" \
+      --ez block_reset $reset --ez block_vpn $vpn --ez block_debug $debug)
+  [[ "$r" == OK* ]] || die "$r"
+  ok "$r"
+
+  info "Vérifications"
+  local mode spec; mode=$(sh_ settings get global private_dns_mode); spec=$(sh_ settings get global private_dns_specifier)
+  [ "$mode" = hostname ] && [ "$spec" = "$dns" ] && ok "DNS privé du système : $spec" \
+      || warn "DNS privé inattendu : mode=$mode serveur=$spec"
+  local st; st=$(send STATUS); echo "   $st"
+  echo "$st" | grep -q "verrou_dns=true" && ok "Modification du DNS privé interdite" || die "Le verrou DNS n'est pas actif : $st"
+
+  if $debug; then
+    info "Dernière étape : coupure du débogage USB (la connexion va se couper)"
+    timeout 15 "$ADB" -s "$SERIAL" shell am broadcast -n "$RECV" -a "$PKG.FINALIZE" >/dev/null 2>&1 || true
+    sleep 2
+    if sh_ settings get global adb_enabled 2>/dev/null | grep -q 1; then
+      warn "Le débogage USB semble toujours actif, vérifie sur le téléphone."
+    else
+      ok "Débogage USB coupé"
+    fi
+  else
+    warn "Débogage USB laissé actif (--allow-debug) : le verrou peut être contourné par adb."
+  fi
+
+  echo
+  ok "${B}Téléphone verrouillé.${N} Tu peux maintenant ajouter tes comptes."
+  echo "   Pour lever le verrou : ouvrir l'app « DNS Lock » sur le téléphone et saisir le code parent."
+}
+
+cmd_status() {
+  need_device
+  app_installed || die "L'app DNS Lock n'est pas installée sur ce téléphone."
+  send STATUS
+}
+
+cmd_unlock() {
+  local release=false; [ "${1:-}" = release ] && release=true
+  need_device
+  app_installed || die "L'app DNS Lock n'est pas installée sur ce téléphone."
+  read_pin
+  local r; r=$(send UNLOCK --es pin "$PIN" --ez release $release); unset PIN
+  [[ "$r" == OK* ]] || die "$r"
+  ok "$r"
+  if $release; then
+    adb_ uninstall "$PKG" >/dev/null 2>&1 && ok "App désinstallée" || warn "Désinstallation manuelle nécessaire."
+  fi
+}
+
+# --- main ---------------------------------------------------------------------
+[ $# -gt 0 ] || { usage; exit 1; }
+args=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -s|--serial) SERIAL=${2:-}; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) args+=("$1"); shift ;;
+  esac
+done
+set -- "${args[@]}"
+cmd=$1; shift
+case "$cmd" in
+  lock) cmd_lock "$@" ;;
+  status) cmd_status ;;
+  unlock) cmd_unlock ;;
+  release) cmd_unlock release ;;
+  build) cmd_build ;;
+  --version|version) echo "phonelock $VERSION" ;;
+  *) die "Commande inconnue : $cmd (voir --help)" ;;
+esac
